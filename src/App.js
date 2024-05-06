@@ -5,6 +5,8 @@ import { app } from "./firebase"
 import { useEffect, useRef, useState } from "react";
 import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, orderBy } from "firebase/firestore";
 
+
+
 const auth = getAuth(app);
 const loginHandler = () => {
   const provider = new GoogleAuthProvider();
@@ -75,9 +77,9 @@ function App() {
     <Box bg={"purple.100"}>
       {
         user ? (
-          <Container h={"100vh"} bg={"blue.100"}>
+          <Container h={"100vh"} bg={"white"} borderRadius={"25px"}>
             <VStack h={"full"} paddingY={"4"} spacing={4}>
-              <Button onClick={logoutHandler} colorScheme={"red"} w={"full"}>
+              <Button borderRadius={"25px"} onClick={logoutHandler} colorScheme={"red"} w={"full"}>
                 Logout
               </Button>
 
@@ -100,8 +102,8 @@ function App() {
 
               <form onSubmit={submitHandler} style={{ width: "100%" }}>
                 <HStack>
-                  <Input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Enter a Message" flex="1" />
-                  <Button type="submit">Send</Button>
+                  <Input borderRadius={"25px"} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Enter a Message" flex="1" />
+                  <Button borderRadius={"25px"} _hover={{backgroundColor:"purple.100"}} type="submit">Send</Button>
                 </HStack>
               </form>
             </VStack>
