@@ -16,7 +16,7 @@ export default function Home() {
         const provider = new GoogleAuthProvider();
         try {
             await signInWithPopup(auth, provider);
-            toast.success(`Welcome ${user.displayName || 'User'}`, {
+            toast.success("Welcome", {
                 icon: '👋',
             });
         } catch (error) {
