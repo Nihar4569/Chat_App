@@ -24,11 +24,18 @@ export default function Home() {
             console.error(error);
         }
     };
-    
+
     //---------------------------------------------------------------
     const roomHandler = (e) => {
         e.preventDefault();
+        // Trim leading and trailing spaces from the room ID
+        if (roomid !== "Messages") {
+            const trimmedRoomId = roomid.trim().toLowerCase();
+            setRoomid(trimmedRoomId);
+            
+        }
         navigate('/chat');
+
     };
 
     useEffect(() => {
@@ -36,10 +43,10 @@ export default function Home() {
             setUser(data);
         })
 
-        return ()=>{
+        return () => {
             unsubscribe();
         }
-    },[])
+    }, [])
 
     return (
         <Box bg={"purple.100"}>
@@ -48,7 +55,7 @@ export default function Home() {
                     <Container h={"100vh"} bg={"white"} borderRadius={"25px"}>
                         <VStack bg={"purple.200"} borderRadius={"100px"} padding={"10px"}>
                             <Container>
-                                <Text textAlign={"center"} fontSize="l" style={{ fontSize: '20px' }} fontWeight="bold">Welcome <br/> {user.displayName}</Text>
+                                <Text textAlign={"center"} fontSize="l" style={{ fontSize: '20px' }} fontWeight="bold">Welcome <br /> {user.displayName}</Text>
                             </Container>
                             <h4 style={{ fontSize: '19px' }}> Enter Room ID</h4>
                             <form onSubmit={roomHandler}>
