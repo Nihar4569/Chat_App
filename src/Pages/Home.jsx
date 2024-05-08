@@ -1,4 +1,4 @@
-import { Box, Button, Container, HStack, Input, VStack } from '@chakra-ui/react';
+import { Box, Button, Container, HStack, Input, Text, VStack } from '@chakra-ui/react';
 import React, { useContext, useEffect, useState } from 'react';
 import { Context } from '../index';
 import { useNavigate } from 'react-router-dom';
@@ -47,7 +47,10 @@ export default function Home() {
                 user ? (
                     <Container h={"100vh"} bg={"white"} borderRadius={"25px"}>
                         <VStack bg={"purple.200"} borderRadius={"100px"} padding={"10px"}>
-                            <h4>Enter Room ID</h4>
+                            <Container>
+                                <Text textAlign={"center"} fontSize="l" style={{ fontSize: '20px' }} fontWeight="bold">Welcome <br/> {user.displayName}</Text>
+                            </Container>
+                            <h4 style={{ fontSize: '19px' }}> Enter Room ID</h4>
                             <form onSubmit={roomHandler}>
                                 <HStack>
                                     <Input value={roomid} onChange={(e) => setRoomid(e.target.value)} borderRadius={"25px"} placeholder="Enter Room ID" flex="1" />
