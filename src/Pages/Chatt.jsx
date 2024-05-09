@@ -10,11 +10,12 @@ import attach from "../Images/attach.png"
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import pdficon from "../Images/pdf.png";
 import { v4 } from 'uuid';
+import Loader from '../Components/Loader';
 
 export default function Chatt() {
   const { user, setUser } = useContext(Context);
   const [messages, setMessages] = useState([]);
-  const { roomid, setRoomid, loader, setLoader } = useContext(Context);
+  const { roomid, setRoomid,loader,setLoader } = useContext(Context);
   const [message, setMessage] = useState("");
   const messagesContainerRef = useRef(null);
   const currentTime = new Date(); // Define currentTime here
@@ -26,7 +27,7 @@ export default function Chatt() {
 
   const [imageUpload, setImageUpload] = useState(null);
   const [imgurl, setImgurl] = useState(null);
-  const [pdfUpload, setPdfUpload] = useState(null);
+  const [pdfUpload , setPdfUpload] = useState(null);
   // const [imageUrls, setImageUrls] = useState([]);
 
   //Firebase------------------------------------
@@ -64,14 +65,17 @@ export default function Chatt() {
           iurl: imgurl,
         });
       }
+      // Clear the imageUpload state
+      setImageUpload(null);
+      setImgurl(null);
       setLoader(false);
       // Scroll to the bottom of messages container
       messagesContainerRef.current.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
-      setLoader(false);
       alert(error);
     }
   };
+  
 
   //Images
   const imagesListRef = ref(storage, roomid);
@@ -81,6 +85,7 @@ export default function Chatt() {
     uploadBytes(imageRef, file).then((snapshot) => {
       getDownloadURL(snapshot.ref).then((url) => {
         setImgurl(url);
+        setImageUpload(null);
       })
     })
     setLoader(false);
@@ -89,6 +94,7 @@ export default function Chatt() {
   useEffect(() => {
     if (imageUpload !== null) {
       imgupload(imageUpload)
+      //setImageUpload(null);
     }
   }, [imageUpload]);
 
@@ -133,7 +139,7 @@ export default function Chatt() {
   const handleDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    setImageUpload(file);
+    //setImageUpload(file);
   };
 
   if (!user) return <Navigate to="/" />;
@@ -168,6 +174,7 @@ export default function Chatt() {
             }
             <div ref={messagesContainerRef} /> {/* Ref to messages container */}
           </VStack>
+          {loader && <Loader />}
           <form onSubmit={submitHandler} style={{ width: "100%" }}>
             <HStack>
               <Input borderRadius={"25px"} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Enter a Message" flex="1" />
@@ -178,11 +185,11 @@ export default function Chatt() {
                 <MenuList>
                   <MenuItem onClick={() => imgInputRef.current.click()}>Images</MenuItem>
                   <input ref={imgInputRef} id="file-upload" type="file" style={{ display: "none" }} accept="image/*" onChange={(event) => setImageUpload(event.target.files[0])} />
-                  <MenuItem onClick={() => vdoInputRef.current.click()}>Videos
-                    <input ref={vdoInputRef} id="file-upload" type="file" style={{ display: "none" }} accept="video/*" onChange={(event) => setImageUpload(event.target.files[0])} />
+                  <MenuItem onClick={()=> vdoInputRef.current.click()}>Videos
+                  <input ref={vdoInputRef} id="file-upload" type="file" style={{ display: "none" }} accept="video/*" onChange={(event) => setImageUpload(event.target.files[0])} />
                   </MenuItem>
                   <MenuItem onClick={() => fileInputRef.current.click()}>Attach File
-                    <input ref={fileInputRef} id="file-upload" type="file" style={{ display: "none" }} onChange={(event) => setImageUpload(event.target.files[0])} /></MenuItem>
+                  <input ref={fileInputRef} id="file-upload" type="file" style={{ display: "none" }} onChange={(event) => setImageUpload(event.target.files[0])} /></MenuItem>
                 </MenuList>
               </Menu>
               <Button borderRadius={"25px"} _hover={{ backgroundColor: "purple.100" }} type="submit">Send</Button>

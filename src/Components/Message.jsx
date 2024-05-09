@@ -9,6 +9,9 @@ function Message({ text, url, user, name, time, iurl }) {
 
   const isPDF = iurl && iurl.toLowerCase().includes('.pdf');
   const isVideo = iurl && /\.(mp4|ogg|webm|avi|wmv|flv|mov|mkv|mpeg|3gp|mpg)/i.test(iurl);
+  const isImage = iurl && /\.(png|jpe?g|gif|bmp)[^/]*$/i.test(iurl);
+  console.log(isImage);
+  
 
   let fileName = '';
 
@@ -35,11 +38,12 @@ function Message({ text, url, user, name, time, iurl }) {
               <source src={iurl} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
-          ) : (
+          ) : isImage ? (
             <a href={iurl} target="_blank" rel="noreferrer">
               <img src={iurl} alt="IMG" style={{ cursor: 'pointer' }} />
             </a>
           )
+          : <></>
         )}
         {isPDF && <Text fontSize="sm">{fileName}</Text>}
         <Text fontSize="sm">{text}</Text>
