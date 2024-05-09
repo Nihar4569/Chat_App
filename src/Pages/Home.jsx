@@ -8,20 +8,23 @@ import toast from 'react-hot-toast';
 
 export default function Home() {
     const navigate = useNavigate();
-    const { roomid, setRoomid, user, setUser } = useContext(Context);
+    const { roomid, setRoomid, user, setUser,loader,setLoader } = useContext(Context);
 
     //Firebase Config
     const auth = getAuth(app)
     const loginHandler = async () => {
         const provider = new GoogleAuthProvider();
         try {
+            setLoader(true);
             await signInWithPopup(auth, provider);
             toast.success("Welcome", {
                 icon: '👋',
             });
+            setLoader(false);
         } catch (error) {
             toast.error('Failed to sign in. Please try again later.');
             console.error(error);
+            setLoader(false);
         }
     };
 

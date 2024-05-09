@@ -9,6 +9,7 @@ export const Context = createContext({});
 const AppWrapper = () => {
   const [roomid, setRoomid] = useState("");
   const [user,setUser] = useState(false);
+  const [loader,setLoader] = useState(false);
 
   return (
     <Context.Provider value={{
@@ -16,6 +17,8 @@ const AppWrapper = () => {
       setRoomid,
       user,
       setUser,
+      loader,
+      setLoader,
     }}>
       <ChakraProvider>
         <App />

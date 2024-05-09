@@ -2,28 +2,32 @@ import { Box, Button, Container, HStack, Input, Menu, MenuButton, MenuItem, Menu
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Context } from '../index';
 import Message from "../Components/Message";
-import { Timestamp, addDoc, collection, getFirestore, onSnapshot, orderBy, query, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, getFirestore, onSnapshot, orderBy, query, serverTimestamp } from 'firebase/firestore';
 import { app, storage } from "../firebase";
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { Navigate, useNavigate } from 'react-router-dom';
 import attach from "../Images/attach.png"
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import pdficon from "../Images/pdf.png";
 import { v4 } from 'uuid';
 
 export default function Chatt() {
   const { user, setUser } = useContext(Context);
   const [messages, setMessages] = useState([]);
-  const { roomid, setRoomid } = useContext(Context);
+  const { roomid, setRoomid, loader, setLoader } = useContext(Context);
   const [message, setMessage] = useState("");
   const messagesContainerRef = useRef(null);
   const currentTime = new Date(); // Define currentTime here
   const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const navigate = useNavigate();
+  const imgInputRef = useRef(null); // Add a ref for the file input element
+  const fileInputRef = useRef(null);
+  const vdoInputRef = useRef(null);
 
   const [imageUpload, setImageUpload] = useState(null);
   const [imgurl, setImgurl] = useState(null);
+  const [pdfUpload, setPdfUpload] = useState(null);
   // const [imageUrls, setImageUrls] = useState([]);
-
 
   //Firebase------------------------------------
   const auth = getAuth(app);
@@ -32,11 +36,11 @@ export default function Chatt() {
   //---------------------------------------------------
 
   const logoutHandler = (e) => {
-
     signOut(auth).then(() => {
       setUser(null); // Set user to null after logout
     });
   };
+
   const switchHandler = (e) => {
     navigate("/");
   }
@@ -48,7 +52,8 @@ export default function Chatt() {
     }
     try {
       setMessage("");
-      if(message || imgurl){
+      setLoader(true);
+      if (message || imgurl) {
         await addDoc(collection(db, roomid), {
           text: message,
           uid: user.uid,
@@ -59,49 +64,40 @@ export default function Chatt() {
           iurl: imgurl,
         });
       }
+      setLoader(false);
       // Scroll to the bottom of messages container
       messagesContainerRef.current.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
+      setLoader(false);
       alert(error);
     }
   };
-  
 
   //Images
   const imagesListRef = ref(storage, roomid);
-  const imgupload = (e) => {
-    if (imageUpload == null){
-      alert("Please select an image");
-      return;
-    };
-    const imageRef = ref(storage, `${roomid}/${imageUpload.name + v4()}`);
-    uploadBytes(imageRef,imageUpload).then((snapshot)=>{
-      getDownloadURL(snapshot.ref).then((url)=>{
+  const imgupload = (file) => {
+    setLoader(true);
+    const imageRef = ref(storage, `${roomid}/${file.name + v4()}`);
+    uploadBytes(imageRef, file).then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((url) => {
         setImgurl(url);
       })
     })
+    setLoader(false);
   }
 
   useEffect(() => {
     if (imageUpload !== null) {
-      imgupload()
+      imgupload(imageUpload)
     }
   }, [imageUpload]);
 
   useEffect(() => {
-    
-    if(imgurl !== null){
+    if (imgurl !== null) {
       console.log(`this is url ${imgurl}`);
       submitHandler();
     }
   }, [imgurl]);
-  
-  
-
-  //------------------------------------
-  
-
-
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (data) => {
@@ -130,12 +126,19 @@ export default function Chatt() {
     return unsubscribeforMessage;
   }, [roomid, db, navigate]);
 
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
 
-
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    setImageUpload(file);
+  };
 
   if (!user) return <Navigate to="/" />;
   return (
-    <Box bg={"purple.100"}>
+    <Box bg={"purple.100"} onDragOver={handleDragOver} onDrop={handleDrop}>
       <Container h={"100vh"} bg={"white"} borderRadius={"25px"}>
         <VStack h={"full"} paddingY={"4"} spacing={4}>
           <h2>{roomid}</h2>
@@ -173,12 +176,13 @@ export default function Chatt() {
                   <img src={attach} />
                 </MenuButton>
                 <MenuList>
-                  <MenuItem>
-                    <label htmlFor="file-upload" style={{ cursor: "pointer" }}>Images</label>
-                    <input id="file-upload" type="file" style={{ display: "none" }} accept="image/*" onChange={(event) => setImageUpload(event.target.files[0])} />
-
+                  <MenuItem onClick={() => imgInputRef.current.click()}>Images</MenuItem>
+                  <input ref={imgInputRef} id="file-upload" type="file" style={{ display: "none" }} accept="image/*" onChange={(event) => setImageUpload(event.target.files[0])} />
+                  <MenuItem onClick={() => vdoInputRef.current.click()}>Videos
+                    <input ref={vdoInputRef} id="file-upload" type="file" style={{ display: "none" }} accept="video/*" onChange={(event) => setImageUpload(event.target.files[0])} />
                   </MenuItem>
-                  <MenuItem>Videos</MenuItem>
+                  <MenuItem onClick={() => fileInputRef.current.click()}>Attach File
+                    <input ref={fileInputRef} id="file-upload" type="file" style={{ display: "none" }} onChange={(event) => setImageUpload(event.target.files[0])} /></MenuItem>
                 </MenuList>
               </Menu>
               <Button borderRadius={"25px"} _hover={{ backgroundColor: "purple.100" }} type="submit">Send</Button>
