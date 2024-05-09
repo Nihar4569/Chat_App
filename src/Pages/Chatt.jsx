@@ -27,7 +27,6 @@ export default function Chatt() {
 
   const [imageUpload, setImageUpload] = useState(null);
   const [imgurl, setImgurl] = useState(null);
-  const [pdfUpload , setPdfUpload] = useState(null);
   // const [imageUrls, setImageUrls] = useState([]);
 
   //Firebase------------------------------------
