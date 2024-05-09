@@ -11,8 +11,8 @@ function Loader() {
                 speed='0.65s'
                 emptyColor='purple'
                 color='blue.500'
-                width='100px' // Custom width
-                height='100px' // Custom height
+                width='50px' // Custom width
+                height='50px' // Custom height
             />
         </>
 

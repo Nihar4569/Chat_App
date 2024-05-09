@@ -53,7 +53,6 @@ export default function Chatt() {
     }
     try {
       setMessage("");
-      setLoader(true);
       if (message || imgurl) {
         await addDoc(collection(db, roomid), {
           text: message,
@@ -68,7 +67,7 @@ export default function Chatt() {
       // Clear the imageUpload state
       setImageUpload(null);
       setImgurl(null);
-      setLoader(false);
+      
       // Scroll to the bottom of messages container
       messagesContainerRef.current.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
@@ -86,10 +85,14 @@ export default function Chatt() {
       getDownloadURL(snapshot.ref).then((url) => {
         setImgurl(url);
         setImageUpload(null);
-      })
-    })
-    setLoader(false);
+        setLoader(false);
+      });
+    }).catch((error) => {
+      console.error("Error uploading image:", error);
+      setLoader(false); 
+    });
   }
+  
 
   useEffect(() => {
     if (imageUpload !== null) {
@@ -97,10 +100,11 @@ export default function Chatt() {
       //setImageUpload(null);
     }
   }, [imageUpload]);
-
+useEffect(()=>{
+  console.log({loader});
+},[loader])
   useEffect(() => {
     if (imgurl !== null) {
-      console.log(`this is url ${imgurl}`);
       submitHandler();
     }
   }, [imgurl]);
@@ -127,6 +131,7 @@ export default function Chatt() {
           return { id, ...item.data() } // Add id to it
         })
       );
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     });
 
     return unsubscribeforMessage;
@@ -179,7 +184,7 @@ export default function Chatt() {
             <HStack>
               <Input borderRadius={"25px"} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Enter a Message" flex="1" />
               <Menu>
-                <MenuButton borderRadius={"25px"} as={Button}>
+                <MenuButton isDisabled={loader} borderRadius={"25px"} as={Button}>
                   <img src={attach} />
                 </MenuButton>
                 <MenuList>
@@ -192,7 +197,7 @@ export default function Chatt() {
                   <input ref={fileInputRef} id="file-upload" type="file" style={{ display: "none" }} onChange={(event) => setImageUpload(event.target.files[0])} /></MenuItem>
                 </MenuList>
               </Menu>
-              <Button borderRadius={"25px"} _hover={{ backgroundColor: "purple.100" }} type="submit">Send</Button>
+              <Button isDisabled={loader} borderRadius={"25px"} _hover={{ backgroundColor: "purple.100" }} type="submit">Send</Button>
             </HStack>
           </form>
         </VStack>

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { app } from '../firebase';
 import { GoogleAuthProvider, getAuth, onAuthStateChanged, signInWithPopup } from 'firebase/auth';
 import toast from 'react-hot-toast';
+import Loader from '../Components/Loader';
 
 export default function Home() {
     const navigate = useNavigate();
@@ -20,11 +21,11 @@ export default function Home() {
             toast.success("Welcome", {
                 icon: '👋',
             });
-            setLoader(false);
+            setLoader(false)
         } catch (error) {
             toast.error('Failed to sign in. Please try again later.');
             console.error(error);
-            setLoader(false);
+            setLoader(false)
         }
     };
 
@@ -67,11 +68,13 @@ export default function Home() {
                                     <Button borderRadius={"25px"} _hover={{ backgroundColor: "purple.100" }} type="submit">Chat</Button>
                                 </HStack>
                             </form>
+                            {loader && <Loader />}
                         </VStack>
                     </Container>
                 ) : (
                     <VStack justifyContent="center" h="100vh" bg={"white"}>
-                        <Button onClick={loginHandler} colorScheme="purple">Signin With Google</Button>
+                        {loader && <Loader />}
+                        <Button onClick={loginHandler} colorScheme="purple">SignIn With Google</Button>
                     </VStack>
                 )
             }

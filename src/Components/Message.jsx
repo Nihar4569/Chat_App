@@ -1,7 +1,8 @@
-import { Avatar, HStack, Text, VStack } from '@chakra-ui/react';
+import { Avatar, Box, Button, HStack, Text, VStack, background } from '@chakra-ui/react';
 import React, { useContext } from 'react';
 import { Context } from '../index';
 import pdficon from "../Images/pdf.png";
+import DownloadIcon from "../Images/download.png";
 
 function Message({ text, url, user, name, time, iurl }) {
 
@@ -10,8 +11,10 @@ function Message({ text, url, user, name, time, iurl }) {
   const isPDF = iurl && iurl.toLowerCase().includes('.pdf');
   const isVideo = iurl && /\.(mp4|ogg|webm|avi|wmv|flv|mov|mkv|mpeg|3gp|mpg)/i.test(iurl);
   const isImage = iurl && /\.(png|jpe?g|gif|bmp)[^/]*$/i.test(iurl);
+  const isAudio = iurl && /\.(mp3|wav|ogg|aac|flac)[^/]*$/i.test(iurl);
+
   console.log(isImage);
-  
+
 
   let fileName = '';
 
@@ -34,16 +37,38 @@ function Message({ text, url, user, name, time, iurl }) {
           </a>
         ) : (
           isVideo ? (
-            <video controls style={{ cursor: 'pointer', maxWidth: '200px' }}>
-              <source src={iurl} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+            <Box position="relative" maxWidth="200px">
+              <video controls style={{ cursor: 'pointer', maxWidth: '100%' }}>
+                <source src={iurl} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              <Button
+                position="absolute"
+                bottom="0"
+                right="0"
+                size="sm"
+                onClick={() => window.open(iurl, '_blank')}
+              >
+                <img src={DownloadIcon} alt="" style={{ width: '15px', height: '15px' }} />
+              </Button>
+            </Box>
+
           ) : isImage ? (
             <a href={iurl} target="_blank" rel="noreferrer">
               <img src={iurl} alt="IMG" style={{ cursor: 'pointer' }} />
             </a>
           )
-          : <></>
+            : isAudio ? (
+              <HStack>
+                <audio controls>
+                  <source src={iurl} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+                <a href={iurl}><img href={iurl} src={DownloadIcon} alt="" style={{ width: '15px', height: '15px' }} /></a>
+                
+              </HStack>
+
+            ) : <></>
         )}
         {isPDF && <Text fontSize="sm">{fileName}</Text>}
         <Text fontSize="sm">{text}</Text>
