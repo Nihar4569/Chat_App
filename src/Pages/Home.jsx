@@ -58,15 +58,15 @@ export default function Home() {
         e.preventDefault()
         try {
             setLoader(true);
-            const roomDoc = await getDoc(doc(db, 'ROOMS', regroomid));
+            const roomDoc = await getDoc(doc(db, 'ROOMS', regroomid.trim().toLowerCase()));
             if (roomDoc.exists()) {
                 toast.error("Room Already Exist")
                 setLoader(false);
             }
 
             else {
-                await setDoc(doc(db, 'ROOMS', regroomid), {
-                    roomid: regroomid,
+                await setDoc(doc(db, 'ROOMS', regroomid.trim().toLowerCase()), {
+                    roomid: regroomid.trim().toLowerCase(),
                     password: regroompass,
                 });
                 toast.success("Room Created")
@@ -84,13 +84,13 @@ export default function Home() {
         e.preventDefault();
         try {
             setLoader(true);
-            const roomDoc = await getDoc(doc(db, 'ROOMS', lroomid));
+            const roomDoc = await getDoc(doc(db, 'ROOMS', lroomid.trim().toLowerCase()));
             if (roomDoc.exists()) {
-                const userData = roomDoc.data();
+                const userData = await roomDoc.data();
                 if (userData.password === lroompass) {
                     setRoomid(userData.roomid)
                     console.log(roomid);
-                    toast.success(`Welcome to the Room ${roomid}`)
+                    toast.success(`Welcome to the Room ${lroomid}`)
                     navigate('/chat')
                     setLroomid("")
                     setLroompass("")
@@ -137,7 +137,7 @@ export default function Home() {
                                 <VStack>
                                     <Text fontWeight="bold" color={"indigo"} style={{ fontSize: '19px' }}>Join Room</Text>
                                     <Input textAlign={"center"} value={lroomid} onChange={(e) => setLroomid(e.target.value)} borderRadius={"25px"} placeholder="Room ID" flex="1" />
-                                    <Input textAlign={"center"} value={lroompass} onChange={(e) => setLroompass(e.target.value)} borderRadius={"25px"} placeholder="Password" flex="1" />
+                                    <Input type="password" textAlign={"center"} value={lroompass} onChange={(e) => setLroompass(e.target.value)} borderRadius={"25px"} placeholder="Password" flex="1" />
                                     <Button isDisabled={loader} borderRadius={"25px"} _hover={{ backgroundColor: "purple.100" }} type="submit">Join Chat</Button>
                                 </VStack>
                             </form>
@@ -152,7 +152,7 @@ export default function Home() {
                                 <VStack>
                                     <Text fontWeight="bold" color={"indigo"} style={{ fontSize: '19px' }}>Create Room</Text>
                                     <Input textAlign={"center"} value={regroomid} onChange={(e) => setRegroomid(e.target.value)} borderRadius={"25px"} placeholder="Room ID" flex="1" />
-                                    <Input textAlign={"center"} value={regroompass} onChange={(e) => setRegroompass(e.target.value)} borderRadius={"25px"} placeholder="Password" flex="1" />
+                                    <Input type="password" textAlign={"center"} value={regroompass} onChange={(e) => setRegroompass(e.target.value)} borderRadius={"25px"} placeholder="Password" flex="1" />
                                     <Button isDisabled={loader} borderRadius={"25px"} _hover={{ backgroundColor: "purple.100" }} type="submit">Create Room</Button>
                                 </VStack>
                             </form>
